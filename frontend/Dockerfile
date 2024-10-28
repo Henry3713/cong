@@ -23,6 +23,9 @@ FROM nginx:stable-alpine
 # Kopiere die gebaute Anwendung in das Nginx-HTML-Verzeichnis
 COPY --from=build /app/dist /usr/share/nginx/html
 
+# Kopiere die benutzerdefinierte Nginx-Konfiguration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Exponiere den Standard-Nginx-Port
 EXPOSE 80
 
