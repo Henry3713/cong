@@ -1,0 +1,29 @@
+{
+  "name": "cong-backend",
+  "version": "1.0.0",
+  "description": "Backend für CONG (Config Generator) mit Nest.js",
+  "main": "dist/main.js",
+  "scripts": {
+    "start": "node dist/main",
+    "build": "nest build"
+  },
+  "dependencies": {
+    "@nestjs/common": "^9.4.0",
+    "@nestjs/config": "^2.2.0",  
+    "@nestjs/core": "^9.4.0",
+    "@nestjs/platform-express": "^9.4.0",
+    "@nestjs/typeorm": "^9.0.1",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.8.1",
+    "sqlite3": "^5.1.6",
+    "typeorm": "^0.3.17",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^9.4.0",
+    "@nestjs/schematics": "^9.0.2",
+    "@nestjs/testing": "^9.4.0",
+    "@types/uuid": "^9.0.1",
+    "typescript": "^5.0.4"
+  }
+}

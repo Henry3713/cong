@@ -1,0 +1,12 @@
+# public/templates/example_template.hbs
+hostname {{hostname}}
+
+interface {{interface_name}}
+  ip address {{ip_address}} {{subnet_mask}}
+  description {{description}}
+
+{{#if enabled}}
+  no shutdown
+{{else}}
+  shutdown
+{{/if}}

@@ -1,0 +1,35 @@
+#version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cong-backend
+    restart: unless-stopped
+    ports:
+      - "${BACKEND_HOST_PORT:-5001}:5001"  # Nutzt eine Umgebungsvariable mit Default-Wert
+    volumes:
+      - ./backend/data:/app/data
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - PORT=${BACKEND_HOST_PORT}
+      - VALIDATOR_PASSWORD=${VALIDATOR_PASSWORD}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${BACKEND_HOST_PORT:-5001}/health"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: cong-frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_HOST_PORT:-3000}:80"
+    depends_on:
+      - backend
+    environment:
+      - REACT_APP_API_BASE_URL=http://localhost:${BACKEND_HOST_PORT:-5001}/api
