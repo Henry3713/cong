@@ -1,6 +1,5 @@
 // src/components/TrashList.tsx
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import {
   List,
   ListItem,
@@ -9,6 +8,7 @@ import {
   Typography,
   Container,
 } from '@mui/material';
+import { getTrash, restoreTemplate, deleteTemplateForever } from '../api'; // Importiere die zentralen API-Funktionen
 
 interface Template {
   id: string;
@@ -27,28 +27,33 @@ const TrashList: React.FC = () => {
 
   const fetchTrashedTemplates = async () => {
     try {
-      const response = await axios.get('http://localhost:5001/api/templates/trash/all');
-      setTrashedTemplates(response.data);
+      const data = await getTrash();
+      setTrashedTemplates(data);
     } catch (error) {
       console.error('Fehler beim Laden der gelöschten Templates:', error);
+      alert('Fehler beim Laden der gelöschten Templates.');
     }
   };
 
   const handleRestore = async (id: string) => {
     try {
-      await axios.post(`http://localhost:5001/api/templates/trash/restore/${id}`);
+      await restoreTemplate(id);
+      alert('Template erfolgreich wiederhergestellt!');
       fetchTrashedTemplates();
     } catch (error) {
       console.error('Fehler beim Wiederherstellen des Templates:', error);
+      alert('Fehler beim Wiederherstellen des Templates.');
     }
   };
 
   const handlePermanentDelete = async (id: string) => {
     try {
-      await axios.delete(`http://localhost:5001/api/templates/trash/${id}`);
+      await deleteTemplateForever(id);
+      alert('Template wurde endgültig gelöscht!');
       fetchTrashedTemplates();
     } catch (error) {
       console.error('Fehler beim endgültigen Löschen des Templates:', error);
+      alert('Fehler beim endgültigen Löschen des Templates.');
     }
   };
 

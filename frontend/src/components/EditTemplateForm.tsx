@@ -1,6 +1,5 @@
 // src/components/EditTemplateForm.tsx
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import {
   TextField,
   Button,
@@ -11,6 +10,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
+import { getTemplateById, updateTemplate } from '../api'; // Importiere die zentralen API-Funktionen
 
 const EditTemplateForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -21,18 +21,21 @@ const EditTemplateForm: React.FC = () => {
   const [content, setContent] = useState('');
 
   useEffect(() => {
-    fetchTemplate();
+    if (id) {
+      fetchTemplate();
+    }
   }, [id]);
 
   const fetchTemplate = async () => {
     try {
-      const response = await axios.get(`http://localhost:5001/api/templates/${id}`);
-      const { name, vendor, content } = response.data;
+      const template = await getTemplateById(id!);
+      const { name, vendor, content } = template;
       setName(name);
       setVendor(vendor);
       setContent(content);
     } catch (error) {
       console.error('Fehler beim Laden des Templates:', error);
+      alert('Fehler beim Laden des Templates.');
     }
   };
 
@@ -43,11 +46,12 @@ const EditTemplateForm: React.FC = () => {
         vendor,
         content,
       };
-      await axios.put(`http://localhost:5001/api/templates/${id}`, updatedTemplate);
+      await updateTemplate(id!, updatedTemplate);
       alert('Template erfolgreich aktualisiert!');
       navigate('/templates');
     } catch (error) {
       console.error('Fehler beim Aktualisieren des Templates:', error);
+      alert('Fehler beim Aktualisieren des Templates.');
     }
   };
 

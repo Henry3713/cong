@@ -1,6 +1,5 @@
 // src/components/TemplateList.tsx
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import {
   Button,
   List,
@@ -22,6 +21,12 @@ import {
   ListItemSecondaryAction,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
+import {
+  fetchTemplates,
+  deleteTemplate,
+  assignTag,
+  removeTag,
+} from '../api'; // Importiere die zentralen API-Funktionen
 
 interface Template {
   id: string;
@@ -49,23 +54,22 @@ const TemplateList: React.FC = () => {
   const [availableTagsToRemove, setAvailableTagsToRemove] = useState<string[]>([]);
 
   useEffect(() => {
-    fetchTemplates();
+    fetchTemplatesList();
   }, [page, vendorFilter, nameFilter, showOffiziell, showVerifiziert]);
 
-  const fetchTemplates = async () => {
+  const fetchTemplatesList = async () => {
     try {
-      const response = await axios.get('http://localhost:5001/api/templates', {
-        params: {
-          page,
-          limit: 5,
-          vendor: vendorFilter || undefined,
-          name: nameFilter || undefined,
-          offiziell: showOffiziell,
-          verifiziert: showVerifiziert,
-        },
-      });
-      setTemplates(response.data.templates);
-      setTotalPages(response.data.totalPages);
+      const params = {
+        page,
+        limit: 5,
+        vendor: vendorFilter || undefined,
+        name: nameFilter || undefined,
+        offiziell: showOffiziell,
+        verifiziert: showVerifiziert,
+      };
+      const data = await fetchTemplates(params);
+      setTemplates(data.templates);
+      setTotalPages(data.totalPages);
     } catch (error) {
       console.error('Fehler beim Laden der Templates:', error);
     }
@@ -73,8 +77,8 @@ const TemplateList: React.FC = () => {
 
   const moveToTrash = async (id: string) => {
     try {
-      await axios.delete(`http://localhost:5001/api/templates/${id}`);
-      fetchTemplates();
+      await deleteTemplate(id);
+      fetchTemplatesList();
     } catch (error) {
       console.error('Fehler beim Verschieben in den Papierkorb:', error);
     }
@@ -91,14 +95,11 @@ const TemplateList: React.FC = () => {
 
   const handleAssignTagSubmit = async () => {
     try {
-      await axios.post(`http://localhost:5001/api/templates/${selectedTemplateId}/assign-tag`, {
-        tag: tagToAssign.toLowerCase(),
-        password,
-      });
+      await assignTag(selectedTemplateId, tagToAssign.toLowerCase(), password);
       alert('Tag erfolgreich zugewiesen!');
       setAssignTagDialogOpen(false);
       setPassword('');
-      fetchTemplates();
+      fetchTemplatesList();
     } catch (error) {
       console.error('Fehler beim Zuweisen des Tags:', error);
       alert('Fehler beim Zuweisen des Tags.');
@@ -107,23 +108,17 @@ const TemplateList: React.FC = () => {
 
   const handleRemoveTag = (templateId: string, currentTags: string[]) => {
     setSelectedTemplateIdForRemoval(templateId);
-    setAvailableTagsToRemove(currentTags || []); // Sicherstellen, dass es ein Array ist
+    setAvailableTagsToRemove(currentTags || []);
     setRemoveTagDialogOpen(true);
   };
 
   const handleRemoveTagSubmit = async () => {
     try {
-      await axios.post(
-        `http://localhost:5001/api/templates/${selectedTemplateIdForRemoval}/remove-tag`,
-        {
-          tag: tagToRemove.toLowerCase(),
-          password,
-        },
-      );
+      await removeTag(selectedTemplateIdForRemoval, tagToRemove.toLowerCase(), password);
       alert('Tag erfolgreich entfernt!');
       setRemoveTagDialogOpen(false);
       setPassword('');
-      fetchTemplates();
+      fetchTemplatesList();
     } catch (error) {
       console.error('Fehler beim Entfernen des Tags:', error);
       alert('Fehler beim Entfernen des Tags.');
@@ -263,8 +258,8 @@ const TemplateList: React.FC = () => {
               value={tagToAssign}
               onChange={(e) => setTagToAssign(e.target.value as string)}
             >
-              <MenuItem value="Offiziell">Offiziell</MenuItem>
-              <MenuItem value="Verifiziert">Verifiziert</MenuItem>
+              <MenuItem value="offiziell">Offiziell</MenuItem>
+              <MenuItem value="verifiziert">Verifiziert</MenuItem>
             </Select>
           </FormControl>
           <TextField

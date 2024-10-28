@@ -1,7 +1,6 @@
 // src/components/ConfigGenerator.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 import {
   TextField,
   Button,
@@ -12,6 +11,7 @@ import {
 import Handlebars from 'handlebars';
 import set from 'lodash/set';
 import get from 'lodash/get';
+import { getTemplateById } from '../api'; // Importiere die zentrale API-Funktion
 
 interface FormField {
   name: string;
@@ -29,7 +29,9 @@ const ConfigGenerator: React.FC = () => {
   const [templateContent, setTemplateContent] = useState('');
 
   useEffect(() => {
-    fetchTemplate();
+    if (templateId) {
+      fetchTemplate();
+    }
   }, [templateId]);
 
   useEffect(() => {
@@ -39,13 +41,14 @@ const ConfigGenerator: React.FC = () => {
 
   const fetchTemplate = async () => {
     try {
-      const response = await axios.get(`http://localhost:5001/api/templates/${templateId}`);
-      const content = response.data.content;
+      const template = await getTemplateById(templateId!);
+      const { content } = template;
       setTemplateContent(content);
       parseTemplate(content);
       generateConfig(formData, content);
     } catch (error) {
       console.error('Fehler beim Laden des Templates:', error);
+      alert('Fehler beim Laden des Templates.');
     }
   };
 

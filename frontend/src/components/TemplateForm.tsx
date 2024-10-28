@@ -1,16 +1,8 @@
 // src/components/TemplateForm.tsx
 import React, { useState } from 'react';
-import axios from 'axios';
-import {
-  TextField,
-  Button,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
-  Typography,
-} from '@mui/material';
+import { Button, TextField, Select, MenuItem, InputLabel, FormControl, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { createTemplate } from '../api'; // Importiere die zentrale API-Funktion
 
 const TemplateForm: React.FC = () => {
   const [name, setName] = useState('');
@@ -38,11 +30,12 @@ interface {{interface_name}}
         vendor,
         content,
       };
-      await axios.post('http://localhost:5001/api/templates', newTemplate);
+      await createTemplate(newTemplate); // Nutze die zentrale Funktion
       alert('Template erfolgreich erstellt!');
       navigate('/templates');
     } catch (error) {
       console.error('Fehler beim Erstellen des Templates:', error);
+      alert('Fehler beim Erstellen des Templates.');
     }
   };
 
