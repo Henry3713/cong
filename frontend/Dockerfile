@@ -1,5 +1,5 @@
 # Stage 1: Build-Phase
-FROM node:18-alpine AS build
+FROM node:21-alpine AS build
 
 RUN apk add curl bash
 

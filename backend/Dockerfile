@@ -2,7 +2,7 @@
 # Dockerfile für das Nest.js Backend
 
 # Stage 1: Build Phase
-FROM node:18-alpine AS builder
+FROM node:21-alpine AS builder
 
 RUN apk add curl
 
@@ -21,7 +21,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Production Phase
-FROM node:18-alpine
+FROM node:21-alpine
 
 WORKDIR /app
 
